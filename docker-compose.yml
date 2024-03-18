@@ -1,0 +1,44 @@
+version: '2'
+services:
+  sql:
+    container_name: sql
+    image: mcr.microsoft.com/mssql/server
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: Y
+      SA_PASSWORD: W1zard1005
+    networks:
+      - "first_web_api"
+    volumes:
+      - "mssqlsystem:/var/opt/mssql"
+      - "mssqluser:/var/opt/sqlserver"
+    restart: always
+  main_web:
+    container_name: main_web
+    image: first_web_api_main_web
+    ports:
+      - "8000:80"
+    networks:
+      - "first_web_api"
+    restart: always
+    depends_on:
+      - sql
+  frontend_ng:
+    container_name: frontend_ng
+    image: first_web_api_ng
+    ports:
+      - "9000:80"
+    networks:
+      - "first_web_api"
+    restart: always
+    depends_on:
+      - main_web
+networks:
+  first_web_api:
+    driver: bridge
+volumes:
+  mssqlsystem:
+    external: true
+  mssqluser:
+    external: true
